@@ -10,34 +10,37 @@ public class Main {
         System.out.println(result);
     }
     // method to calculate the RPN expression
-    public static double calculateRPN(String ar){
-        double y=0;
-        double x=0;
-        Stack<Double> stack = new LinkedStack<>(); // a linkedStack called stack to store the values
-        String[] inpSplit = ar.split(" "); // splitting the input string by a space
-        for (String str : inpSplit){ // this iterates through every element in the array and checks
-            // if the element being popped is a number or an operator
-            if(isNum(str)){
-                stack.push(Double.parseDouble(str)); // interprets the double value from the string and pushes it
-            } else if (isOperator(str)) { // if the element is an operator, it does the appropriate calculation
-                x = stack.pop();
-                y = stack.pop();
-                switch (str) {
-                    case "+":
-                        stack.push(y + x);
-                        break;
-                    case "-":
-                        stack.push(y - x);
-                        break;
-                    case "*":
-                        stack.push(y * x);
-                        break;
-                    case "/":
-                        stack.push(y / x);
-                        break;
-                    default:
-                        return 0;
+    public static double calculateRPN(String ar) {
+        Stack<Double> stack = new LinkedStack<>();  // a linkedStack called stack to store the values
+        String[] inpSplit = ar.trim().split(" ");   // splitting the input string by a space
+
+        for (String str : inpSplit) {   // this iterates through every element in the array and checks
+                                        // if the element being popped is a number or an operator
+            if (isNum(str)) {
+                stack.push(Double.parseDouble(str));
+            } else if (isOperator(str)) {
+
+                if (stack.size() < 2) {     //validating if there are enough operands in the stack
+                    throw new IllegalArgumentException(
+                            "Not enough operands"
+                    );
                 }
+
+                double x = stack.pop();
+                double y = stack.pop();
+                switch (str) {
+                    case "+": stack.push(y + x); break;
+                    case "-": stack.push(y - x); break;
+                    case "*": stack.push(y * x); break;
+                    case "/": if(x == 0){
+                        throw new IllegalArgumentException("Division by zero is not possible"); // a special case for division by zero is taken care of here
+                    } else stack.push(y / x); break;
+                    case "^": stack.push(Math.pow(y, x)); break;
+                    default: return 0;
+                }
+            } else {
+                // in a case where it's not a number or an operator
+                throw new IllegalArgumentException("Invalid expression"); // throws an exception if the input is invalid
             }
         }
         return stack.pop();
@@ -52,6 +55,6 @@ public class Main {
         }
     }
     static boolean isOperator(String str){
-        return str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/");
+        return str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/") || str.equals("^");
     }
 }
